@@ -1,0 +1,17 @@
+Q: How can I reset my password?
+A: You can reset your password by clicking on "Forgot Password" on the login page and following the instructions.
+
+Q: What is your refund policy?
+A: Refunds are processed within 5 to 7 business days after approval.
+
+Q: How do I contact customer support?
+A: You can contact customer support via email at support@company.com or through the in-app chat.
+
+Q: Do you offer international shipping?
+A: Yes, we offer international shipping to selected countries. Shipping charges may apply.
+
+Q: How can I track my order?
+A: Once your order is shipped, you will receive a tracking link via email.
+
+Q: How do I get a refund?
+A: To request a refund, please contact customer support via email at support@company.com or use the in-app chat. Once approved, refunds are processed within 5 to 7 business days.
