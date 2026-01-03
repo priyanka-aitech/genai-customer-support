@@ -1,4 +1,4 @@
-# app/vector_store.py
+'''# app/vector_store.py
 
 """
 This file is responsible for:
@@ -22,7 +22,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 
-
+VECTORSTORE = None
 # ----------------------------
 # CONSTANTS
 # ----------------------------
@@ -111,4 +111,38 @@ def get_retriever():
     vectorstore = create_vector_store()
 
     # k = number of top relevant chunks to retrieve
-    return vectorstore.as_retriever(search_kwargs={"k": 3})
+    return vectorstore.as_retriever(search_kwargs={"k": 3})'''
+
+#=============================================================================================
+from langchain_community.vectorstores import Chroma
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_text_splitters import CharacterTextSplitter
+import os
+
+VECTORSTORE = None
+
+def load_faq_text():
+    path = "data/raw_docs/faq.txt"
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"FAQ file not found at {path}")
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
+
+def create_vector_store():
+    global VECTORSTORE
+    if VECTORSTORE is not None:
+        return VECTORSTORE
+
+    faq_text = load_faq_text()
+    splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    chunks = splitter.split_text(faq_text)
+
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    vectordb = Chroma.from_texts(chunks, embeddings, persist_directory="chroma_db")
+    vectordb.persist()
+    VECTORSTORE = vectordb
+    return VECTORSTORE
+
+def get_retriever():
+    return create_vector_store().as_retriever()
+

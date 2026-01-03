@@ -1,4 +1,4 @@
-from langchain_ollama import OllamaLLM
+'''from langchain_ollama import OllamaLLM
 from langchain_classic.prompts import PromptTemplate
 #from langchain.schema import Document
 from langchain_core.documents import Document
@@ -70,4 +70,62 @@ if __name__ == "__main__":
     print(test_question)
 
     print("\n----- ANSWER -----")
-    print(get_rag_answer(test_question))
+    print(get_rag_answer(test_question))'''
+#===================================================================================
+
+from app.vector_store import get_retriever
+from langchain_ollama import Ollama
+
+
+def get_rag_answer(question: str) -> str:
+    """
+    Manual RAG pipeline:
+    1. Retrieve relevant docs using Chroma retriever
+    2. Build context
+    3. Ask Ollama LLM
+    """
+
+    # 1️⃣ Get retriever (lazy-loaded)
+    retriever = get_retriever()
+
+    # 2️⃣ Retrieve documents (CORRECT API)
+    docs = retriever.invoke(question)
+
+    if not docs:
+        return "Sorry, I could not find relevant information."
+
+    # 3️⃣ Build context
+    context = "\n\n".join(doc.page_content for doc in docs)
+
+    # 4️⃣ LLM
+    llm = Ollama(
+        model="llama3",
+        temperature=0.2,
+        num_ctx=1024
+    )
+
+    # 5️⃣ Prompt
+    prompt = f"""
+You are a customer support assistant.
+Answer ONLY using the context below.
+
+Context:
+{context}
+
+Question:
+{question}
+"""
+
+    # 6️⃣ Generate answer
+    response = llm.invoke(prompt)
+
+    return response
+
+
+# Local test
+if __name__ == "__main__":
+    q = "How do I get a refund?"
+    print("----- QUESTION -----")
+    print(q)
+    print("\n----- ANSWER -----")
+    print(get_rag_answer(q))
